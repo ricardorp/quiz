@@ -8,18 +8,25 @@ exports.new = function (req, res) {
         pregunta: 'Pregunta',
         respuesta: 'Respuesta'
     });
-    res.render('quizes/new', {quiz: quiz});
+    res.render('quizes/new', {quiz: quiz, errors : []});
 };
 
 // POST /quizes/create
 exports.create = function (req, res) {
+    console.log("quiz: " + req.body.quiz);
     var quiz = models.Quiz.build(req.body.quiz);
     // guarda en BD los campos pregunta y respuesta de quiz
-    quiz.save({
-        fields: ['pregunta', 'respuesta']
-    }).then(function () {
-        res.redirect('/quizes');
-    }); // Redirección HTTP a la lista de preguntas.
+    quiz.validate()
+        .then(function (err) {
+            if (err) {
+                res.render('quizes/new', {quiz: quiz, errors: err.errors});
+            } else {
+                quiz.save({fields: ['pregunta', 'respuesta']}).then(function () {
+                    res.redirect('/quizes'); // Redirección HTTP a la lista de preguntas.
+                });
+            }
+        }
+    );
 };
 
 // Autoload - factoriza el código si ruta incluye :quizId
@@ -46,7 +53,7 @@ exports.index = function (req, res) {
 
     models.Quiz.findAll(whereSection).then(
         function (quizes) {
-            res.render('quizes/index.ejs', {quizes: quizes});
+            res.render('quizes/index.ejs', {quizes: quizes, errors : []});
         }
     ).catch(function (error) {
             next(error);
@@ -57,7 +64,8 @@ exports.index = function (req, res) {
 exports.show = function (req, res) {
     res.render('quizes/show', {
         title: title,
-        quiz: req.quiz
+        quiz: req.quiz,
+        errors : []
     });
 };
 
@@ -70,13 +78,14 @@ exports.answer = function (req, res) {
     res.render('quizes/answer', {
         title: title,
         quiz: req.quiz,
-        respuesta: resultado
+        respuesta: resultado,
+        errors : []
     });
 };
 
 // GET /author
 exports.author = function (req, res) {
-    res.render('author', {author: author});
+    res.render('author', {author: author, errors : []});
 };
 
 /**
