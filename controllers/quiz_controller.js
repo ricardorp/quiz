@@ -55,6 +55,18 @@ exports.edit = function(req, res) {
     res.render('quizes/edit', {quiz: quiz, errors: []});
 };
 
+// DELETE /quizes/:id/edit
+exports.destroy = function (req, res) {
+    req.quiz.destroy().then(
+        function () {
+            res.redirect('/quizes');
+
+        }).catch(
+        function (error) {
+            next(error);
+        }
+    );
+};
 // Autoload - factoriza el código si ruta incluye :quizId
 exports.load = function (req, res, next, quizId) {
     models.Quiz.find(quizId).then(
