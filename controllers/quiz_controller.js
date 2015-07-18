@@ -9,7 +9,7 @@ exports.new = function (req, res) {
         respuesta: 'Respuesta',
         tema: 'otro'
     });
-    res.render('quizes/new', {quiz: quiz, errors : []});
+    res.render('quizes/new', {quiz: quiz, errors: []});
 };
 
 // POST /quizes/create
@@ -52,7 +52,7 @@ exports.update = function (req, res) {
 };
 
 // GET /quizes/:id/edit
-exports.edit = function(req, res) {
+exports.edit = function (req, res) {
     var quiz = req.quiz; // autoload de la instancia de quiz
     res.render('quizes/edit', {quiz: quiz, errors: []});
 };
@@ -71,7 +71,10 @@ exports.destroy = function (req, res) {
 };
 // Autoload - factoriza el código si ruta incluye :quizId
 exports.load = function (req, res, next, quizId) {
-    models.Quiz.find(quizId).then(
+    models.Quiz.find({
+        where: {id: Number(quizId)},
+        include: [{model: models.Comment}]
+    }).then(
         function (quiz) {
             if (quiz) {
                 req.quiz = quiz;
@@ -93,7 +96,7 @@ exports.index = function (req, res) {
 
     models.Quiz.findAll(whereSection).then(
         function (quizes) {
-            res.render('quizes/index.ejs', {quizes: quizes, errors : []});
+            res.render('quizes/index.ejs', {quizes: quizes, errors: []});
         }
     ).catch(function (error) {
             next(error);
@@ -105,7 +108,7 @@ exports.show = function (req, res) {
     res.render('quizes/show', {
         title: title,
         quiz: req.quiz,
-        errors : []
+        errors: []
     });
 };
 
@@ -119,13 +122,13 @@ exports.answer = function (req, res) {
         title: title,
         quiz: req.quiz,
         respuesta: resultado,
-        errors : []
+        errors: []
     });
 };
 
 // GET /author
 exports.author = function (req, res) {
-    res.render('author', {author: author, errors : []});
+    res.render('author', {author: author, errors: []});
 };
 
 /**
