@@ -46,7 +46,7 @@ exports.findStatistics = function (callback) {
         i = 0,
         media = 0;
     sequelize.query(
-        "select q.id, count(c.id) comentarios from Quizzes q left join Comments c on c.QuizId = q.id group by q.id",
+        'select q.id, count(c.id) comentarios from "Quizzes" q left join "Comments" c on c."QuizId" = q.id group by q.id',
         {type: sequelize.QueryTypes.SELECT}
     ).success(function (preguntas) {
             numPreguntas = preguntas.length;
