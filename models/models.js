@@ -43,6 +43,7 @@ exports.findStatistics = function (callback) {
         numComentarios = 0,
         numPreguntasSinComentarios = 0,
         numPreguntasConComentarios = 0,
+        comentarios = 0,
         i = 0,
         media = 0;
     sequelize.query(
@@ -51,8 +52,9 @@ exports.findStatistics = function (callback) {
     ).success(function (preguntas) {
             numPreguntas = preguntas.length;
             for(i = 0; i < preguntas.length; i++) {
-                numComentarios += preguntas[i].comentarios;
-                if (preguntas[i].comentarios == 0) {
+                comentarios = new Number(preguntas[i].comentarios);
+                numComentarios += comentarios;
+                if (comentarios == 0) {
                     numPreguntasSinComentarios++;
                 } else {
                     numPreguntasConComentarios++;
