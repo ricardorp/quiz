@@ -1,3 +1,5 @@
+var sessionMaxIdleTime = 1000*60*2; // milliseconds * seconds * minutes
+
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -27,9 +29,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Helpers dinámicos
 app.use(function(req, res, next) {
+    var user = req.session.user,
+        lastUsed = new Number(req.session.lastUsed),
+        ahora = (new Date()).getTime();
     // guardar path en session.redir para después de login
     if (!req.path.match(/\/login|\/logout/)) {
         req.session.redir = req.path;
+        if (user) {
+            if (lastUsed && (ahora - lastUsed) < sessionMaxIdleTime) {
+                lastUsed = ahora;
+            } else {
+                delete req.session.user;
+                console.log('Sesión para el usuario ' + user.username + ', cerrada.');
+            }
+        }
     }
 
     // Hacer visible req.session en las vistas
