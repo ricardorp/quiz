@@ -1,3 +1,4 @@
+// Tiempo máximo de inactividad antes de cerrar la sesión del usuario.
 var sessionMaxIdleTime = 1000*60*2; // milliseconds * seconds * minutes
 
 var express = require('express');
@@ -35,6 +36,8 @@ app.use(function(req, res, next) {
     // guardar path en session.redir para después de login
     if (!req.path.match(/\/login|\/logout/)) {
         req.session.redir = req.path;
+
+        // Gestión de auto logout
         if (user) {
             if (lastUsed && (ahora - lastUsed) < sessionMaxIdleTime) {
                 lastUsed = ahora;

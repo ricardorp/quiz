@@ -36,7 +36,38 @@ Comment.belongsTo(Quiz);
 Quiz.hasMany(Comment);
 
 exports.Quiz = Quiz; // Exportar definición de la tabla Quiz
-exports.Comment = Comment;
+exports.Comment = Comment; // Exportar definición de la tabla Comment
+
+exports.findStatistics = function (callback) {
+    var numPreguntas = 0,
+        numComentarios = 0,
+        numPreguntasSinComentarios = 0,
+        numPreguntasConComentarios = 0,
+        i = 0,
+        media = 0;
+    sequelize.query(
+        "select q.id, count(c.id) comentarios from Quizzes q left join Comments c on c.QuizId = q.id group by q.id",
+        {type: sequelize.QueryTypes.SELECT}
+    ).success(function (preguntas) {
+            numPreguntas = preguntas.length;
+            for(i = 0; i < preguntas.length; i++) {
+                numComentarios += preguntas[i].comentarios;
+                if (preguntas[i].comentarios == 0) {
+                    numPreguntasSinComentarios++;
+                } else {
+                    numPreguntasConComentarios++;
+                }
+            }
+            media = (numPreguntas != 0 ? numComentarios / numPreguntas : 0).toFixed(2);
+            callback({
+                numeroPreguntas: numPreguntas,
+                numeroComentarios: numComentarios,
+                mediaComentariosPregunta : media,
+                numeroPreguntasSinComentarios: numPreguntasSinComentarios,
+                numeroPreguntasConComentarios: numPreguntasConComentarios
+            });
+        });
+};
 
 // sequelize.sync() crea e inicializa tabla de preguntas BD
 sequelize.sync().success(function () {
